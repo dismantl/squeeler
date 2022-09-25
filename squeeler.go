@@ -345,7 +345,9 @@ func (sqlr *Sqlr) RunShell() {
 				cliArgs[1] = "xp_cmdshell"
 				s, err := NewSqlrFromCmdLine(cliArgs, false)
 				if err != nil {
-					c.Println(err.Error())
+					if !strings.Contains(err.Error(), "usage:") {
+						c.Println(err.Error())
+					}
 				} else {
 					results, err := sqlr.ExecXpCmdShell(s.XpCommand, s.XpTimeout)
 					if err != nil {
@@ -361,7 +363,7 @@ func (sqlr *Sqlr) RunShell() {
 					cmd := c.ReadLine()
 					switch cmd {
 					case "back":
-						shell.SetPrompt(fmt.Sprintf("%s (%s) » ", sqlr.Server, sqlr.Database))
+						shell.SetPrompt(fmt.Sprintf("%s » ", sqlr.Server))
 						return
 					case "exit":
 						bye()
@@ -389,7 +391,9 @@ func (sqlr *Sqlr) RunShell() {
 				cliArgs[1] = "query"
 				s, err := NewSqlrFromCmdLine(cliArgs, false)
 				if err != nil {
-					c.Println(err.Error())
+					if !strings.Contains(err.Error(), "usage:") {
+						c.Println(err.Error())
+					}
 				} else {
 					err = sqlr.Query(s.QueryString, s.QueryTimeout)
 					if err != nil {
@@ -403,7 +407,7 @@ func (sqlr *Sqlr) RunShell() {
 					query := c.ReadLine()
 					switch query {
 					case "back":
-						shell.SetPrompt(fmt.Sprintf("%s (%s) » ", sqlr.Server, sqlr.Database))
+						shell.SetPrompt(fmt.Sprintf("%s » ", sqlr.Server))
 						return
 					case "exit":
 						bye()
@@ -438,7 +442,9 @@ func (sqlr *Sqlr) RunShell() {
 			cliArgs[1] = "enum_link"
 			s, err := NewSqlrFromCmdLine(cliArgs, false)
 			if err != nil {
-				c.Println(err.Error())
+				if !strings.Contains(err.Error(), "usage:") {
+					c.Println(err.Error())
+				}
 			} else {
 				sqlr.EnumLink(s.EnumLinkChain)
 			}
@@ -454,7 +460,9 @@ func (sqlr *Sqlr) RunShell() {
 			cliArgs[1] = "enable_rpc"
 			s, err := NewSqlrFromCmdLine(cliArgs, false)
 			if err != nil {
-				c.Println(err.Error())
+				if !strings.Contains(err.Error(), "usage:") {
+					c.Println(err.Error())
+				}
 			} else {
 				err = sqlr.EnableRpc(s.RpcTarget)
 				if err != nil {
@@ -473,7 +481,9 @@ func (sqlr *Sqlr) RunShell() {
 			cliArgs[1] = "capture_hash"
 			s, err := NewSqlrFromCmdLine(cliArgs, false)
 			if err != nil {
-				c.Println(err.Error())
+				if !strings.Contains(err.Error(), "usage:") {
+					c.Println(err.Error())
+				}
 			} else {
 				err = sqlr.CaptureHash(s.SmbServer, s.SmbShare)
 				if err != nil {
@@ -492,7 +502,9 @@ func (sqlr *Sqlr) RunShell() {
 			cliArgs[1] = "sp_oa"
 			s, err := NewSqlrFromCmdLine(cliArgs, false)
 			if err != nil {
-				c.Println(err.Error())
+				if !strings.Contains(err.Error(), "usage:") {
+					c.Println(err.Error())
+				}
 			} else {
 				err = sqlr.ExecSpOa(s.SpOaCommand, s.SpOaTimeout)
 				if err != nil {
@@ -511,7 +523,9 @@ func (sqlr *Sqlr) RunShell() {
 			cliArgs[1] = "assembly"
 			s, err := NewSqlrFromCmdLine(cliArgs, false)
 			if err != nil {
-				c.Println(err.Error())
+				if !strings.Contains(err.Error(), "usage:") {
+					c.Println(err.Error())
+				}
 			} else {
 				results, err := sqlr.ExecAssembly(s.AssemblyCommand, s.AssemblyTimeout)
 				if err != nil {
@@ -532,7 +546,9 @@ func (sqlr *Sqlr) RunShell() {
 			cliArgs[1] = "link_exec"
 			s, err := NewSqlrFromCmdLine(cliArgs, false)
 			if err != nil {
-				c.Println(err.Error())
+				if !strings.Contains(err.Error(), "usage:") {
+					c.Println(err.Error())
+				}
 			} else {
 				results, err := sqlr.ExecLinkCommand(s.ExecLinkCommandString, s.ExecLinkTimeout, s.ExecLinkChain)
 				if err != nil {
@@ -631,12 +647,23 @@ func (sqlr *Sqlr) ExecXpCmdShell(cmd string, timeout time.Duration) (string, err
 
 	cmdCtx, cmdCancel := context.WithTimeout(context.Background(), timeout)
 	defer cmdCancel()
-	var results string
-	err = sqlr.Db.QueryRowContext(cmdCtx, fmt.Sprintf(execXpCmdShellTemplate, cmd)).Scan(&results)
+	rows, err := sqlr.Db.QueryContext(cmdCtx, fmt.Sprintf(execXpCmdShellTemplate, cmd))
 	if err != nil {
 		return "", err
 	}
-	return results, nil
+	defer rows.Close()
+	var lines []string
+	for rows.Next() {
+		var line string
+		if err = rows.Scan(&line); err == nil {
+			lines = append(lines, line)
+		}
+	}
+	if err = rows.Err(); err != nil {
+		return "", err
+	}
+
+	return strings.Join(lines, "\n"), nil
 }
 
 func (sqlr *Sqlr) CaptureHash(smbServer, smbShare string) error {
