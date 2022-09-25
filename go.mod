@@ -5,7 +5,6 @@ go 1.19
 require (
 	github.com/abiosoft/ishell/v2 v2.0.2
 	github.com/akamensky/argparse v1.4.0
-	github.com/briandowns/spinner v1.19.0
 	github.com/denisenkom/go-mssqldb v0.12.2
 	github.com/olekukonko/tablewriter v0.0.5
 	github.com/pkg/errors v0.9.1
