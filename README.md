@@ -9,7 +9,7 @@ _______ _______                   ___          _______
 			 `--'                                       
 ```
 
-SQueeLeR is a Microsoft SQL Server enumeration and exploitation tool written in Go. It can perform basic enumeration of targets and linked servers and perform command execution using three different techniques.
+SQueeLeR is a Microsoft SQL Server enumeration and exploitation toolkit written in Go. It can perform basic enumeration of targets and linked servers and perform command execution using three different techniques.
 
 ## Features
 
