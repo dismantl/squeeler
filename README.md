@@ -7,10 +7,7 @@ _______ _______                   ___          _______
 |::.. . |::..   |                 |::.. . |    |::.|:. |
 `-------`----|:.|                 `-------'    `--- ---'
 			 `--'                                       
- [[ A product of ACAB Enterprises (@acabenterprises) ]]
 ```
-
-**Official URL: https://acab.enterprises/dismantl/squeeler**. Mirror at https://github.com/dismantl/squeeler.
 
 SQueeLeR is a Microsoft SQL Server enumeration and exploitation tool written in Go. It can perform basic enumeration of targets and linked servers and perform command execution using three different techniques.
 
@@ -49,8 +46,6 @@ _______ _______                   ___          _______
 |::.. . |::..   |                 |::.. . |    |::.|:. |
 `-------`----|:.|                 `-------'    `--- ---'
              `--'                                       
- [[ A product of ACAB Enterprises (@acabenterprises) ]]
-
 
 Commands:
   assembly          Run system command via managed code custom assembly
