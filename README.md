@@ -1,25 +1,16 @@
-```
-_______ _______                   ___          _______ 
-|   _   |   _   .--.--.-----.-----|   |  .-----|   _   \
-|   1___|.  |   |  |  |  -__|  -__|.  |  |  -__|.  l   /
-|____   |.  |   |_____|_____|_____|.  |__|_____|.  _   1
-|:  1   |:  1   |                 |:  1   |    |:  |   |
-|::.. . |::..   |                 |::.. . |    |::.|:. |
-`-------`----|:.|                 `-------'    `--- ---'
-			 `--'                                       
-```
+# SQueeLeR
 
 SQueeLeR is a Microsoft SQL Server enumeration and exploitation toolkit written in Go. It can perform basic enumeration of targets and linked servers and perform command execution using three different techniques.
 
 ## Features
 
-* **Cross-platform**: SQueeLeR can be compiled and run from any system supported by the Go language. Compiles easily into native executables that can be converted to shellcode and run from memory using [Donut](https://github.com/TheWover/donut).
-* **Interactive REPL shell**: Take one-off actions using command line arguments, or drop into an interactive shell (with history and tab-completion) for executing further commands or queries.
-* **Multiple means of command execution**: In addition to the well-known `xp_cmdshell` and `sp_OACreate` methods for executing system commands on a target server, you can also get code execution using a custom .NET assembly stored procedure.
-* **Impersonation**: Impersonate users before executing queries, when allowed.
-* **Windows integrated security**: Pass the `-w` flag instead of a username and password on Windows to connect using the current user account.
-* **Capture NTLM hash**: Instruct the SQL server to connect to an SMB share of the attacker's choice, allowing capturing the NTLM hash of the user under which the SQL server is running.
-* **Execute queries and commands on linked servers**: Traverse any number of linked SQL servers in order to execute queries and system commands.
+- **Cross-platform**: SQueeLeR can be compiled and run from any system supported by the Go compiler.
+- **Interactive REPL shell**: Take one-off actions using command line arguments, or drop into an interactive shell (with history and tab-completion) for executing further commands or queries.
+- **Multiple means of command execution**: In addition to the well-known `xp_cmdshell` and `sp_OACreate` methods for executing system commands on a target server, you can also get code execution using a custom .NET assembly stored procedure.
+- **Impersonation**: Impersonate users before executing queries, when allowed.
+- **Windows integrated security**: Pass the `-w` flag instead of a username and password on Windows to connect using the current user account.
+- **Capture NTLM hash**: Instruct the SQL server to connect to an SMB share of the attacker's choice, allowing capturing the NTLM hash of the user under which the SQL server is running.
+- **Execute queries and commands on linked servers**: Traverse any number of linked SQL servers in order to execute queries and system commands.
 
 ## Building and usage
 
@@ -38,14 +29,14 @@ You can now execute queries/actions once using command line flags (type `-h`/`--
 ```
 $ squeeler.exe shell -s sql01.local -u lab\\user -p S3cr3t
 
-_______ _______                   ___          _______ 
+_______ _______                   ___          _______
 |   _   |   _   .--.--.-----.-----|   |  .-----|   _   \
 |   1___|.  |   |  |  |  -__|  -__|.  |  |  -__|.  l   /
 |____   |.  |   |_____|_____|_____|.  |__|_____|.  _   1
 |:  1   |:  1   |                 |:  1   |    |:  |   |
 |::.. . |::..   |                 |::.. . |    |::.|:. |
 `-------`----|:.|                 `-------'    `--- ---'
-             `--'                                       
+             `--'
 
 Commands:
   assembly          Run system command via managed code custom assembly
@@ -72,8 +63,8 @@ Basic enumeration can be done with the `enum` command, or the `enum_link` comman
 
 ```
 sql01 » enum
-Server version: Microsoft SQL Server 2012 (SP3) (KB3072779) - 11.0.6020.0 (X64) 
-        Oct 20 2015 15:36:27 
+Server version: Microsoft SQL Server 2012 (SP3) (KB3072779) - 11.0.6020.0 (X64)
+        Oct 20 2015 15:36:27
         Copyright (c) Microsoft Corporation
         Standard Edition (64-bit) on Windows NT 6.3 <X64> (Build 14393: ) (Hypervisor)
 
@@ -81,23 +72,23 @@ Login: RLAB\epugh_adm (dbo)
 User is a member of public role
 User is a member of sysadmin role
 Discovered databases: master, tempdb, model, msdb, umbraco
-Logins that can be impersonated: 
+Logins that can be impersonated:
 Linked SQL servers: SQL01, SQL02
 ```
 
 ```
 sql01 » enum_link -l sql02
-Server version: Microsoft SQL Server 2016 (SP2-GDR) (KB4583460) - 13.0.5103.6 (X64) 
-        Nov  1 2020 00:13:28 
+Server version: Microsoft SQL Server 2016 (SP2-GDR) (KB4583460) - 13.0.5103.6 (X64)
+        Nov  1 2020 00:13:28
         Copyright (c) Microsoft Corporation
         Standard Edition (64-bit) on Windows Server 2016 Standard 10.0 <X64> (Build 14393: ) (Hypervisor)
 
 Login: link (guest)
 User is a member of public role
 User is NOT a member of sysadmin role
-Discovered databases: 
-Logins that can be impersonated: 
-Linked SQL servers: 
+Discovered databases:
+Logins that can be impersonated:
+Linked SQL servers:
 ```
 
 ## Querying
@@ -161,7 +152,7 @@ SQueeLeR will connect to the `master` database by default, but you can specify a
 ```
 sql01 (master) » use msdb
 Switched active database to msdb
-sql01 (msdb) »  
+sql01 (msdb) »
 ```
 
 ## Command execution
@@ -219,7 +210,7 @@ Arguments:
   -v  --verbose  Enable debug output
 ```
 
-Executing commands on linked servers requires the link to be configured with [RPC Out](https://learn.microsoft.com/en-us/previous-versions/sql/sql-server-2008-r2/ms186839(v=sql.105)?redirectedfrom=MSDN), which is not enabled by default. This setting can be turned on with the `enable_rpc` command.
+Executing commands on linked servers requires the link to be configured with [RPC Out](<https://learn.microsoft.com/en-us/previous-versions/sql/sql-server-2008-r2/ms186839(v=sql.105)?redirectedfrom=MSDN>), which is not enabled by default. This setting can be turned on with the `enable_rpc` command.
 
 ## NTLM hash capturing and relaying
 

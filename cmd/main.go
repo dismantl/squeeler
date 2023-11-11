@@ -4,8 +4,8 @@ import (
 	"fmt"
 	"os"
 
-	"acab.enterprises/dismantl/squeeler"
 	_ "github.com/denisenkom/go-mssqldb"
+	"github.com/dismantl/squeeler"
 	"github.com/rs/zerolog"
 	"github.com/rs/zerolog/log"
 	"github.com/rs/zerolog/pkgerrors"
@@ -21,7 +21,6 @@ _______ _______                   ___          _______
 |::.. . |::..   |                 |::.. . |    |::.|:. |
 ` + "`-------`----|:.|                 `-------'    `--- ---'" + `
 			 ` + "`" + `--'                                       
- [[ A product of ACAB Enterprises (@acabenterprises) ]]
 
 `
 

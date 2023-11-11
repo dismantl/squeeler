@@ -1,4 +1,4 @@
-module acab.enterprises/dismantl/squeeler
+module github.com/dismantl/squeeler
 
 go 1.19
 
