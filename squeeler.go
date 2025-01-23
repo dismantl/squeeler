@@ -16,18 +16,21 @@ import (
 	"github.com/pkg/errors"
 	"github.com/rs/zerolog"
 	"github.com/rs/zerolog/log"
+	sqldblogger "github.com/simukti/sqldb-logger"
+	"github.com/simukti/sqldb-logger/logadapter/zerologadapter"
 )
 
 type SqlrCommand int
 
 type Sqlr struct {
-	Db            *sql.DB
+	Db            *sql.Conn
 	Server        string
 	Database      string
 	Username      string
 	Password      string
 	UseIntegrated bool
 	Impersonate   string
+	Verbose       bool
 
 	Cmd                   SqlrCommand
 	RpcTarget             string
@@ -202,11 +205,7 @@ func NewSqlrFromCmdLine(args []string, parseConnection bool) (*Sqlr, error) {
 	if err != nil {
 		return nil, errors.New(parser.Usage(err))
 	}
-	if *verbose {
-		zerolog.SetGlobalLevel(zerolog.DebugLevel)
-	} else {
-		zerolog.SetGlobalLevel(zerolog.InfoLevel)
-	}
+	zerolog.SetGlobalLevel(zerolog.InfoLevel)
 
 	sqlr := &Sqlr{}
 	if parseConnection {
@@ -216,6 +215,7 @@ func NewSqlrFromCmdLine(args []string, parseConnection bool) (*Sqlr, error) {
 		sqlr.Password = *password
 		sqlr.UseIntegrated = *useIntegrated
 		sqlr.Impersonate = *impersonate
+		sqlr.Verbose = *verbose
 	}
 
 	if enumCmd.Happened() {
@@ -274,7 +274,14 @@ func (sqlr *Sqlr) Connect() error {
 	if err != nil {
 		return errors.Wrap(err, "Error connecting to database")
 	}
-	sqlr.Db = db
+	if sqlr.Verbose {
+		loggerAdapter := zerologadapter.New(zerolog.New(os.Stdout))
+		db = sqldblogger.OpenDriver(connString, db.Driver(), loggerAdapter)
+	}
+	sqlr.Db, err = db.Conn(context.Background())
+	if err != nil {
+		return errors.Wrap(err, "Error creating database connection")
+	}
 
 	ctx, cancel := context.WithTimeout(context.Background(), 15*time.Second)
 	defer cancel()
@@ -283,7 +290,7 @@ func (sqlr *Sqlr) Connect() error {
 	}
 
 	if sqlr.Impersonate != "" {
-		_, err := sqlr.Db.ExecContext(ctx, "EXECUTE AS LOGIN = '$1'", sqlr.Impersonate)
+		_, err := sqlr.Db.ExecContext(ctx, "EXECUTE AS LOGIN = @p1", sqlr.Impersonate)
 		if err != nil {
 			return errors.Wrap(err, "Failed to impersonate user")
 		}
